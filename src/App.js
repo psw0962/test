@@ -29,23 +29,30 @@ const addUser = async (user) => {
 
 function App() {
   // Call all users
-  const { data: users, isLoading, isFetching, error } = useQuery("users", fetchUsers);
+  const { data: users, isLoading, isFetching, error,refetch } = useQuery("users", fetchUsers);
 
   // Create a Mutation for adding user
-  // const {mutate, mutateAsync, isLoading: isAddingUser, error: addError} = useMutation(addUser, {
-  //   onSuccess:
-  // })
+  const {mutate, mutateAsync, isLoading: isAddingUser, error: addError} = useMutation(addUser)
+
+  const handleAddUser = async() => {
+    const data = await mutateAsync({first_name: 'React Query', last_name: 'Rules!'});
+    console.log('This was an async mutation!');
+    console.log(data);
+    refetch();
+  }
 
   if (isLoading) {
     return <p>Loading...</p>;
   }
 
-  if (error) {
+  if (error || addError) {
     return <p>Something went wrong</p>;
   }
 
   return (
     <div>
+      {isAddingUser ? <p>Adding user...</p> : null}
+      <button onClick={() => handleAddUser()}>Add User</button>
       {users.data.map((user) => (
         <p key={user.id}>
           {user.first_name} {user.last_name}
